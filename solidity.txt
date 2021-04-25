@@ -1,0 +1,79 @@
+pragma solidity >=0.7.0 <0.9.0;
+contract TiendaVanessaDaou{
+    address private duenio; 
+    uint256 private ganancias;
+    uint256 private deudaTotal;
+    
+    
+    struct cliente{
+        address direccion; 
+        uint256 codigo;
+        string nombre;
+        string pais;
+        uint256 deudaActual;
+    
+    
+    }
+
+
+    struct producto{
+        string  nombre;
+        uint256 precioBase;
+        uint256 unidadesInventario;
+        string descripcion;
+        
+    }
+    
+    
+    struct compra{
+        cliente clienteComprador;
+        string nombreProducto;
+
+    }
+    
+    
+ 
+    
+    mapping(uint256 => cliente) public clientes;
+    mapping(string => producto) public productos;
+   
+   
+    modifier esDuenio() {
+        require(msg.sender == duenio, "No es el duenio");
+        _; 
+    }    
+   
+   modifier productoUnico(string memory nombre){
+        require(keccak256(bytes((productos[nombre].nombre))) != keccak256(bytes(nombre)),"Producto ya registrado");
+        _;    
+       
+       
+   }
+   
+    
+       modifier clienteUnico(uint256 codigo){
+        require( clientes[codigo].codigo != codigo,"Cliente ya registrado");
+        _;    
+       
+       
+   }
+   
+    
+    
+    
+    constructor(){
+        duenio = msg.sender;
+    }
+    
+    function registrarProducto(string memory nombre,uint256 precioBase,uint256 unidadesInventario,string memory descripcion) public esDuenio() productoUnico(nombre){
+       productos[nombre] = producto(nombre, precioBase, unidadesInventario,descripcion);
+    
+    
+    }
+        
+    function registrarCliente(uint256 codigo,string memory nombre,string memory pais) public clienteUnico(codigo){
+        clientes[codigo] = cliente(msg.sender,codigo,nombre,pais,0);
+    }
+    
+    
+}    
